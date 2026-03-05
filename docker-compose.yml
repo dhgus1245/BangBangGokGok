@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  flask:
+    build: .
+    image: flask
+    container_name: flask-api
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data/images:/app/data/images

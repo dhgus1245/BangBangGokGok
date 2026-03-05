@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>*방방곡곡* 내게 맞는 아파트 검색</title>
+    <!-- templates/index.html -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <style>
+      .apartments {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+      }
+      .apartment {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        width: 320px;
+        overflow: hidden;
+      }
+      .apartment img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+          box-shadow 0.15s;
+        cursor: pointer;
+      }
+      .apartment:hover img {
+        transform: scale(1.03);
+        box-shadow: 0 4px 16px rgba(30, 136, 229, 0.15);
+      }
+      .apartment-info {
+        padding: 20px;
+        transition: box-shadow 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+      }
+      .apartment-info:hover {
+        box-shadow: 0 0 24px 4px rgba(30, 136, 229, 0.18);
+      }
+      @media (max-width: 900px) {
+        .apartments {
+          flex-direction: column;
+          align-items: center;
+        }
+        .apartment {
+          width: 95%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      {% include 'header.html' %}
+      <div class="container">
+        <h2>추천 아파트 매물</h2>
+        <div class="apartments">
+          <div class="apartment">
+            <img
+              src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80"
+              alt="아파트1"
+            />
+            <div class="apartment-info">
+              <div class="apartment-title">래미안 강남아파트</div>
+              <div class="apartment-desc">
+                84㎡, 3룸 2욕실, 역세권, 남향, 15층
+              </div>
+              <div class="apartment-price">매매가 12억 5,000만원</div>
+            </div>
+          </div>
+          <div class="apartment">
+            <img
+              src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80"
+              alt="아파트2"
+            />
+            <div class="apartment-info">
+              <div class="apartment-title">푸르지오 시티</div>
+              <div class="apartment-desc">
+                59㎡, 2룸 1욕실, 신축, 초등학교 인근
+              </div>
+              <div class="apartment-price">매매가 7억 8,000만원</div>
+            </div>
+          </div>
+          <div class="apartment">
+            <img
+              src="https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=600&q=80"
+              alt="아파트3"
+            />
+            <div class="apartment-info">
+              <div class="apartment-title">힐스테이트 송도</div>
+              <div class="apartment-desc">101㎡, 4룸 2욕실, 공원뷰, 남동향</div>
+              <div class="apartment-price">매매가 9억 2,000만원</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% include 'footer.html' %}
+    </div>
+  </body>
+</html>

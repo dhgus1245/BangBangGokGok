@@ -1,0 +1,99 @@
+<header>
+  <h1>아파트 매매 전문 부동산</h1>
+  <p>서울 아파트 실매물 정보 제공</p>
+</header>
+<nav>
+  <a href="/">홈</a>
+  <a href="#" id="searchBtn">매물검색</a>
+  <a href="/intro">회사소개</a>
+</nav>
+
+<!-- 모달 백드롭 -->
+<div class="modal-backdrop" id="modalBackdrop"></div>
+<!-- 매물검색 모달 -->
+<div
+  class="modal"
+  id="searchModal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="modalTitle"
+>
+  <div class="modal-title" id="modalTitle">매물 검색</div>
+  <form action="./result" method="get">
+    <label for="city">시/도</label>
+    <select id="city" name="city">
+      <option value="">선택</option>
+      <option value="서울">서울</option>
+      <option value="경기">경기</option>
+      <option value="인천">인천</option>
+    </select>
+    <label for="district">군/구</label>
+    <select id="district" name="district">
+      <option value="">선택</option>
+      <option value="강남구">강남구</option>
+      <option value="서초구">서초구</option>
+      <option value="송파구">송파구</option>
+      <option value="분당구">분당구</option>
+      <option value="수원시">수원시</option>
+      <option value="부평구">부평구</option>
+    </select>
+    <label for="price">금액(만원 단위)</label>
+    <input
+      type="number"
+      id="price"
+      name="price"
+      min="0"
+      placeholder="예) 10000"
+    />
+    <label for="station">역세권</label>
+    <select id="station" name="station">
+      <option value="">선택</option>
+      <option value="yes">예</option>
+      <option value="no">아니오</option>
+    </select>
+    <div class="modal-actions">
+      <button type="button" class="close-btn" id="modalCloseBtn">닫기</button>
+      <button type="submit">검색</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  // 모달 열기/닫기
+  const searchBtn = document.getElementById("searchBtn");
+  const modal = document.getElementById("searchModal");
+  const backdrop = document.getElementById("modalBackdrop");
+  const closeBtn = document.getElementById("modalCloseBtn");
+
+  function openModal() {
+    modal.classList.add("active");
+    backdrop.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+  function closeModal() {
+    modal.classList.remove("active");
+    backdrop.classList.remove("active");
+    document.body.style.overflow = "";
+  }
+
+  searchBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    openModal();
+  });
+  closeBtn.addEventListener("click", closeModal);
+  backdrop.addEventListener("click", closeModal);
+
+  // ESC로 닫기
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeModal();
+  });
+
+  // (옵션) 폼 전송 시 모달 닫기 (실제 검색 기능은 구현 필요)
+  document
+    .querySelector("#searchModal form")
+    .addEventListener("submit", function (e) {
+      //e.preventDefault();
+      alert("검색 조건으로 매물을 찾습니다!");
+      closeModal();
+    });
+</script>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>*방방곡곡* 내게 맞는 아파트 검색</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <style>
+      .team-profile {
+        margin: 40px auto;
+        padding: 24px;
+        background: #f8f8ff;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+      }
+      .team-profile h2 {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+      .profiles {
+        display: flex;
+        justify-content: space-around;
+        gap: 20px;
+      }
+      .profile {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+        width: 180px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+      .profile-img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 12px;
+        border: 2px solid #e0e0e0;
+      }
+      .profile-info h3 {
+        margin: 8px 0 4px 0;
+        font-size: 1.1em;
+      }
+      .profile-info p {
+        margin: 2px 0;
+        color: #555;
+        font-size: 0.95em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      {% include 'header.html' %}
+      <div class="container">
+        <div class="team-profile">
+          <h2>TEAM 방방곡곡</h2>
+          <div class="profiles">
+            <div class="profile">
+              <img
+                src="/static/img/profile01.png"
+                alt="팀원1 프로필"
+                class="profile-img"
+              />
+              <div class="profile-info">
+                <h3>이슬기</h3>
+                <p>대장</p>
+                <p>
+                  데이터로 인사이트를 발견하고 전략을 설계하는 데이터 분석
+                  팀장입니다.
+                </p>
+              </div>
+            </div>
+            <div class="profile">
+              <img
+                src="/static/img/profile02.png"
+                alt="팀원1 프로필"
+                class="profile-img"
+              />
+              <div class="profile-info">
+                <h3>송승민</h3>
+                <p>책사</p>
+                <p>데이터로 가치를 만드는 분석가입니다.</p>
+              </div>
+            </div>
+            <div class="profile">
+              <img
+                src="/static/img/profile06.png"
+                alt="팀원2 프로필"
+                class="profile-img"
+              />
+              <div class="profile-info">
+                <h3>오현석</h3>
+                <p>오른팔</p>
+                <p>팀장님 오른팔입니다.</p>
+              </div>
+            </div>
+            <div class="profile">
+              <img
+                src="/static/img/profile08.png"
+                alt="팀원3 프로필"
+                class="profile-img"
+              />
+              <div class="profile-info">
+                <h3>강동영</h3>
+                <p>왼팔</p>
+                <p>팀장님 왼팔입니다.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% include 'footer.html' %}
+    </div>
+    <script></script>
+  </body>
+</html>
