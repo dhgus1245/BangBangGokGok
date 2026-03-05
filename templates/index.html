@@ -4,51 +4,199 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>*방방곡곡* 내게 맞는 아파트 검색</title>
-    <!-- templates/index.html -->
+
+    <!-- 스타일 CSS (Flask용) -->
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
     />
+
+    <!-- Swiper CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/swiper/swiper-bundle.min.css"
+    />
+
     <style>
-      .apartments {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 30px;
+      /* 메인 페이지 전용 스타일 - 헤더와 충돌 방지 */
+      .container h2 {
+        margin-top: 50px;
+        margin-bottom: 0;
+        margin-left: 20px;
       }
-      .apartment {
+
+      .apartment-swiper {
+        width: 100%;
+        max-width: 1024px;
+        margin: 40px auto;
+        padding: 10px 0;
+      }
+
+      .apartment-swiper .swiper-slide {
+        display: flex;
+        justify-content: center;
+      }
+
+      .apartment-card {
         background: #fff;
         border-radius: 10px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        width: 320px;
+        width: 300px;
+        height: 350px;
         overflow: hidden;
+        transition: transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
       }
-      .apartment img {
+
+      .apartment-card img {
         width: 100%;
         height: 200px;
         object-fit: cover;
-        transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-          box-shadow 0.15s;
-        cursor: pointer;
+        transition: transform 0.2s ease;
       }
-      .apartment:hover img {
+
+      .apartment-card:hover img {
         transform: scale(1.03);
-        box-shadow: 0 4px 16px rgba(30, 136, 229, 0.15);
       }
+
       .apartment-info {
-        padding: 20px;
-        transition: box-shadow 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-        cursor: pointer;
+        padding: 16px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
       }
-      .apartment-info:hover {
-        box-shadow: 0 0 24px 4px rgba(30, 136, 229, 0.18);
+
+      .apartment-title {
+        font-weight: bold;
+        font-size: 18px;
+        margin-bottom: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
-      @media (max-width: 900px) {
-        .apartments {
-          flex-direction: column;
-          align-items: center;
+
+      .apartment-desc {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 8px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.4;
+        height: 2.8em;
+      }
+
+      .apartment-price {
+        font-weight: bold;
+        color: #1976d2;
+        margin-top: auto;
+      }
+
+      /* 모바일 반응형 스타일 */
+      @media (max-width: 768px) {
+        .container h2 {
+          margin-top: 30px;
+          margin-left: 15px;
+          font-size: 18px;
         }
-        .apartment {
-          width: 95%;
+
+        .apartment-swiper {
+          margin: 20px auto;
+          padding: 5px 0;
+        }
+
+        .apartment-card {
+          width: 280px;
+          height: 320px;
+        }
+
+        .apartment-card img {
+          height: 180px;
+        }
+
+        .apartment-info {
+          padding: 12px;
+        }
+
+        .apartment-title {
+          font-size: 16px;
+          margin-bottom: 6px;
+        }
+
+        .apartment-desc {
+          font-size: 13px;
+          margin-bottom: 6px;
+        }
+
+        .apartment-price {
+          font-size: 14px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container h2 {
+          margin-top: 25px;
+          margin-left: 10px;
+          font-size: 16px;
+        }
+
+        .apartment-swiper {
+          margin: 15px auto;
+          padding: 5px 10px;
+        }
+
+        .apartment-card {
+          width: 250px;
+          height: 300px;
+        }
+
+        .apartment-card img {
+          height: 160px;
+        }
+
+        .apartment-info {
+          padding: 10px;
+        }
+
+        .apartment-title {
+          font-size: 15px;
+          margin-bottom: 5px;
+        }
+
+        .apartment-desc {
+          font-size: 12px;
+          margin-bottom: 5px;
+          height: 2.4em;
+        }
+
+        .apartment-price {
+          font-size: 13px;
+        }
+      }
+
+      @media (max-width: 320px) {
+        .apartment-card {
+          width: 220px;
+          height: 280px;
+        }
+
+        .apartment-card img {
+          height: 140px;
+        }
+
+        .apartment-title {
+          font-size: 14px;
+        }
+
+        .apartment-desc {
+          font-size: 11px;
+        }
+
+        .apartment-price {
+          font-size: 12px;
         }
       }
     </style>
@@ -57,48 +205,149 @@
     <div class="wrapper">
       {% include 'header.html' %}
       <div class="container">
-        <h2>추천 아파트 매물</h2>
-        <div class="apartments">
-          <div class="apartment">
-            <img
-              src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80"
-              alt="아파트1"
-            />
-            <div class="apartment-info">
-              <div class="apartment-title">래미안 강남아파트</div>
-              <div class="apartment-desc">
-                84㎡, 3룸 2욕실, 역세권, 남향, 15층
+        <h2>✨럭셔리 아파트✨</h2>
+
+        <!-- Swiper 캐러셀 시작 -->
+        <div class="swiper apartment-swiper">
+          <div class="swiper-wrapper">
+            <!-- 슬라이드 -->
+            {% for apt in exp_apt %}
+            <div class="swiper-slide">
+              <div class="apartment-card">
+                <img
+                  class="exp_apt"
+                  src="/static/img/no_img_apt.jpg"
+                  alt="{{apt.name}}"
+                />
+                <div class="apartment-info">
+                  <div class="apartment-title">{{apt.name}}</div>
+                  <div class="apartment-desc">
+                    {{apt.gu}} {{apt.dong}} <br />
+                    {{apt.pyung}}평 / {{apt.years}} 연식 / 지하철
+                    {{apt.sub_dist}}m
+                  </div>
+                  <div class="apartment-price">
+                    {% set eok = (apt.price // 10000) | int %} {% set chun =
+                    (apt.price % 10000) | int %} 매매가 {{ eok }}억{% if chun >
+                    0 %} {{ "{:,.0f}".format(chun) }}만원{% endif %}
+                  </div>
+                </div>
               </div>
-              <div class="apartment-price">매매가 12억 5,000만원</div>
             </div>
+            {% endfor %}
           </div>
-          <div class="apartment">
-            <img
-              src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80"
-              alt="아파트2"
-            />
-            <div class="apartment-info">
-              <div class="apartment-title">푸르지오 시티</div>
-              <div class="apartment-desc">
-                59㎡, 2룸 1욕실, 신축, 초등학교 인근
+
+          <!-- 네비게이션 버튼 -->
+          <!-- <div class="swiper-button-prev"></div>
+          <div class="swiper-button-next"></div> -->
+        </div>
+
+        <h2>📈상승이 예상되는 아파트🔺</h2>
+        <div class="swiper apartment-swiper">
+          <div class="swiper-wrapper">
+            <!-- 슬라이드 -->
+            {% for apt in reg_apt %}
+            <div class="swiper-slide">
+              <div class="apartment-card">
+                <img
+                  class="reg_apt"
+                  src="/static/img/no_img_apt.jpg"
+                  alt="{{apt.name}}"
+                />
+                <div class="apartment-info">
+                  <div class="apartment-title">{{apt.name}}</div>
+                  <div class="apartment-desc">
+                    {{apt.gu}} {{apt.dong}} <br />
+                    {{apt.pyung}}평 / {{apt.years}} 연식 / 지하철
+                    {{apt.sub_dist}}m
+                  </div>
+                  <div class="apartment-price">
+                    {% set eok = (apt.price // 10000) | int %} {% set chun =
+                    (apt.price % 10000) | int %} 매매가 {{ eok }}억{% if chun >
+                    0 %} {{ "{:,.0f}".format(chun) }}만원{% endif %}
+                  </div>
+                </div>
               </div>
-              <div class="apartment-price">매매가 7억 8,000만원</div>
             </div>
+            {% endfor %}
           </div>
-          <div class="apartment">
-            <img
-              src="https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=600&q=80"
-              alt="아파트3"
-            />
-            <div class="apartment-info">
-              <div class="apartment-title">힐스테이트 송도</div>
-              <div class="apartment-desc">101㎡, 4룸 2욕실, 공원뷰, 남동향</div>
-              <div class="apartment-price">매매가 9억 2,000만원</div>
-            </div>
-          </div>
+
+          <!-- 네비게이션 버튼 -->
+          <!-- <div class="swiper-button-prev"></div>
+          <div class="swiper-button-next"></div> -->
         </div>
       </div>
       {% include 'footer.html' %}
     </div>
+
+    <!-- Swiper JS -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+      new Swiper(".apartment-swiper", {
+        slidesPerView: 3,
+        slidesPerGroup: 1,
+        spaceBetween: 20,
+        autoplay: {
+          delay: 3000, // 3초마다 자동 이동
+          disableOnInteraction: false, // 사용자 상호작용 후에도 계속 자동재생
+        },
+        breakpoints: {
+          0: {
+            slidesPerView: 1,
+          },
+          600: {
+            slidesPerView: 2,
+          },
+          1024: {
+            slidesPerView: 3,
+          },
+        },
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        //럭셔리 아파트
+        const expList = document.querySelectorAll("img.exp_apt");
+        const expSrcList = [
+          "/static/img/exp_apt/park_hannam.jpg", //파르크한남
+          "/static/img/exp_apt/ph129.jpg", //ph129
+          "/static/img/exp_apt/nineone_hannam.jpg", //나인원한남
+          "/static/img/exp_apt/hyosung.jpg", //효성빌라청담
+          "/static/img/exp_apt/gallery_apore.jpg", //갤러리 아포레
+          "/static/img/exp_apt/sanziz.jpg", //상지즈리츠빌카일룸
+          "/static/img/exp_apt/hanyang8.jpg", //한양 8차
+          "/static/img/exp_apt/yeounseo.jpg", //연세리버스테라스
+          "/static/img/exp_apt/hyundai2.jpg", //현대2차
+          "/static/img/exp_apt/hyundaibillart.jpg", //현대빌라트
+        ];
+
+        //상승예측 아파트
+        expList.forEach((img, index) => {
+          if (index < expSrcList.length) {
+            img.src = expSrcList[index];
+          }
+        });
+
+        const regList = document.querySelectorAll("img.reg_apt");
+        const regSrcList = [
+          "/static/img/reg_apt/bicondreamhill.jpg", //비콘드림힐3
+          "/static/img/reg_apt/hanyang5.jpg", //한양5
+          "/static/img/reg_apt/whagaymanshon.jpg", //화계맨숀
+          "/static/img/reg_apt/samwhan.jpg", //삼환
+          "/static/img/reg_apt/haringturnplace.jpg", //해링턴플레이스
+          "/static/img/reg_apt/sansungremian.jpg", //삼성레미안안
+          "/static/img/reg_apt/hanullnewtown.jpg", //한울뉴타운운
+          "/static/img/reg_apt/haneillsernusbill.jpg", //한일써너스빌빌
+          "/static/img/reg_apt/purun3.jpg", //늘푸르3차
+          "/static/img/reg_apt/sungrock.jpg", //성락
+        ];
+
+        regList.forEach((img, index) => {
+          if (index < regSrcList.length) {
+            img.src = regSrcList[index];
+          }
+        });
+      });
+    </script>
   </body>
 </html>

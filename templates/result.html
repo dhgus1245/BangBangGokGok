@@ -9,17 +9,30 @@
       href="{{ url_for('static', filename='css/style.css') }}"
     />
     <!-- 최신 네이버 지도 SDK -->
-    <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=w34ajnfbak"></script>
+    <script
+      type="text/javascript"
+      src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=w34ajnfbak"
+    ></script>
     <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .wrapper {
+        height: 100%;
+      }
       .container {
         display: flex;
         width: 100%;
         height: 60vh;
-        padding:0px;
+        padding: 0px;
         border: 2px solid #aaa;
         border-radius: 12px;
         box-sizing: border-box;
         overflow: hidden;
+        margin: 20px auto;
       }
       .list {
         width: 30%;
@@ -54,39 +67,56 @@
       .apt-item:hover {
         background: #e0e0e0;
       }
-      .apt-sale{
+      .apt-sale {
         display: none;
-        border: 1px solid #ddd; 
-        border-radius: 8px; 
-        padding: 16px; 
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
         font-family: sans-serif;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
       }
-      .apt-nm{
-        font-size: 18px; 
-        font-weight: bold; 
+      .apt-nm {
+        font-size: 18px;
+        font-weight: bold;
         margin-bottom: 8px;
       }
-      .apt-info{
-        color: #666; 
-        font-size: 13px; 
+      .apt-info {
+        color: #666;
+        font-size: 13px;
         margin-bottom: 8px;
       }
-      .apt-info2{
-        color: #d22; 
-        font-size: 14px; 
+      .apt-info2 {
+        color: #d22;
+        font-size: 14px;
         margin-bottom: 4px;
       }
-      .apt-info3{
-        color: #666; 
-        font-size: 12px; 
+      .apt-info3 {
+        color: #666;
+        font-size: 12px;
         margin-bottom: 10px;
       }
-      .apt-info4{
-        font-size: 13px; 
+      .apt-info4 {
+        font-size: 13px;
         margin-bottom: 4px;
       }
-
+      .favorite-btn {
+        background: #1e88e5;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 10px;
+        width: 100%;
+      }
+      .favorite-btn:hover {
+        background: #1565c0;
+      }
+      .favorite-btn.added {
+        background: #999;
+        cursor: default;
+      }
     </style>
   </head>
   <body>
@@ -95,8 +125,21 @@
       <div class="container">
         <div class="list" id="apt-list">
           {% for apt in aptList %}
-          <div class="apt-item" onclick="clickAptSaleInfo('{{ apt.markerId }}')">{{ apt.complexName }}</div>
-          <div class="apt-sale" id="apt-{{ apt.markerId }}"></div>
+          <div
+            class="apt-item"
+            onclick="clickAptSaleInfo('{{ apt.markerId }}')"
+          >
+            {{ apt.complexName }}
+          </div>
+          <div class="apt-sale" id="apt-{{ apt.markerId }}">
+            <button
+              class="favorite-btn"
+              onclick="addToFavorites('{{ apt.markerId }}')"
+              id="favorite-{{ apt.markerId }}"
+            >
+              관심목록에 추가
+            </button>
+          </div>
           {% else %}
           <div class="no-apt">일치하는 아파트 정보가 없습니다.</div>
           {% endfor %}
@@ -113,10 +156,10 @@
       //입력 조건
       const aptCon = {{ aptCon | tojson }};
 
-      // console.log(aptList); 
-      // console.log(coords);  
-      // console.log(aptCon);  
-      
+      // console.log(aptList);
+      // console.log(coords);
+      // console.log(aptCon);
+
       let mapParams = {
           zoom: 15,
           zoomControl: true,
@@ -151,33 +194,34 @@
           title: item.title,
           clickable: true
         });
-
+        // console.log(item);
         // markerId를 키로 저장
         markerMap[item.markerId] = marker;
 
         //이미지 유무
-        const photoUrl = (item.representativePhoto) ? `https://landthumb-phinf.pstatic.net${item.representativePhoto}` : "/static/img/no_img_apt.jpg";  // 대체 이미지
-        // 마커 클릭 시 info window 예시
-        const infoWindow = new naver.maps.InfoWindow({
-          content: `
+        const photoUrl = (item.representativePhoto) ? `<img src="https://landthumb-phinf.pstatic.net${item.representativePhoto}" alt="아파트 이미지" style="width:80px; height:80px; border-radius: 4px; margin-right: 10px;">` : "";
+        var contentDiv = `
             <div style="
               display: flex;
               align-items: center;
               padding: 10px;
-              border: 1px solid #ccc;
+              border: -5px solid #ccc;
               //border-radius: 8px;
               background-color: white;
               font-family: sans-serif;
               max-width: 250px;
-            ">
-              <img src="`+photoUrl+`" alt="아파트 이미지" style="width:80px; height:80px; border-radius: 4px; margin-right: 10px;">
-              <div>
-                <div style="font-weight: bold; font-size: 14px;">${item.complexName}</div>
-                <div style="font-size: 12px; color: #555;">평수: ${item.minArea} ~ ${item.maxArea}</div>
-                <div style="font-size: 12px; color: #555;">가격: ${item.minDealPrice} ~ ${item.maxDealPrice}</div>
-              </div>
+            ">`+photoUrl+`<div>
+              <div style="font-weight: bold; font-size: 14px;">${item.complexName}</div>
+              <div style="font-size: 12px; color: #555;">크기(㎡): ${item.minArea} ~ ${item.maxArea}</div>`
+              if(item.maxDealPrice){
+                contentDiv += `<div style="font-size: 12px; color: #555;">가격(만원): ${item.minDealPrice} ~ ${item.maxDealPrice}</div>`
+              }
+            +`</div>
             </div>
           `
+        // 마커 클릭 시 info window 예시
+        const infoWindow = new naver.maps.InfoWindow({
+          content: contentDiv
         });
 
         naver.maps.Event.addListener(marker, 'click', () => {
@@ -187,65 +231,135 @@
       });
     </script>
     <script>
-      function clickAptSaleInfo(markerId){
+      function clickAptSaleInfo(markerId) {
         const marker = markerMap[markerId];
         if (marker) {
-          naver.maps.Event.trigger(marker, 'click');
+          naver.maps.Event.trigger(marker, "click");
         } else {
-          console.warn('Marker not found for id:', markerId);
+          console.warn("Marker not found for id:", markerId);
         }
       }
 
       //아파트 매매 거래 상세내역
       async function getAptSaleInfo(markerId) {
         try {
-          const response = await fetch('/sale', {
-            method: 'POST',
+          const response = await fetch("/sale", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json'
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              markerId: markerId
-            })
+              markerId: markerId,
+            }),
           });
 
           if (!response.ok) {
-            throw new Error('서버 응답 오류: ' + response.status);
+            throw new Error("서버 응답 오류: " + response.status);
           }
 
           const result = await response.json();
-          // console.log('서버 응답:', result);
-          const aptInfo = `
-          <div class="apt_nm">`+result.apt.complexName+`</div>
-          <div class="apt-info">`+result.apt.totalHouseHoldCount+`세대 / 총 `+result.apt.totalDongCount+`동 / `+result.apt.useApproveYmd.replace(/(\d{4})(\d{2})(\d{2})/, '$1.$2.$3')
-          +`<br>`+result.apt.minArea+`㎡ ~ `+result.apt.maxArea+`㎡</div>
-          <div class="apt-info2">최근 매매 실거래가</div>
-          <div class="apt-info2" style="font-size: 22px; font-weight: bold; margin-bottom: 8px;">`+result.apt.realPrice.formattedPrice+`</div>
-          <div class="apt-info3">`+result.apt.realPrice.formattedTradeYearMonth+`, `+result.apt.realPrice.floor+`층, `+result.apt.realPrice.representativeArea+`㎡</div>
-          <div class="apt-info4">
-            매매가: <strong>`+result.apt.minPriceByLetter+` ~ `+result.apt.maxPriceByLetter+`</strong>
-          </div>
-          <div class="apt-info4">
-            전세가: <strong>`+result.apt.minLeasePriceByLetter+` ~ `+result.apt.maxLeasePriceByLetter+`</strong>
-          </div>
-          `
-          // 1. 모든 .apt-sale 요소 숨기기
-          const saleItems = document.querySelectorAll('.apt-sale');
-          saleItems.forEach(item => {
-            item.style.display = 'none';
-          });
-          // 2. 해당 ID 요소만 보이게 하기
-          document.getElementById('apt-'+ markerId).innerHTML = aptInfo;
-          const target = document.getElementById('apt-' + markerId);
-          if (target) {
-            target.style.display = 'block';
+          let aptInfo =
+            `
+          <div class="apt_nm">` +
+            result.apt.complexName +
+            `</div>
+          <div class="apt-info">` +
+            result.apt.totalHouseHoldCount +
+            `세대 / 총 ` +
+            result.apt.totalDongCount +
+            `동 / ` +
+            result.apt.useApproveYmd.replace(
+              /(\d{4})(\d{2})(\d{2})/,
+              "$1.$2.$3"
+            ) +
+            `<br>` +
+            result.apt.minArea +
+            `㎡ ~ ` +
+            result.apt.maxArea +
+            `㎡ (` +
+            squareMeterToPyeong(result.apt.minArea) +
+            `~` +
+            squareMeterToPyeong(result.apt.maxArea) +
+            `평)</div>`;
+          if (result.apt.realPrice) {
+            aptInfo +=
+              `<div class="apt-info2">최근 매매 실거래가</div>
+            <div class="apt-info2" style="font-size: 22px; font-weight: bold; margin-bottom: 8px;">` +
+              result.apt.realPrice.formattedPrice +
+              `</div>
+            <div class="apt-info3">` +
+              result.apt.realPrice.formattedTradeYearMonth +
+              `, ` +
+              result.apt.realPrice.floor +
+              `층, ` +
+              result.apt.realPrice.representativeArea +
+              `㎡</div>`;
           }
+          aptInfo +=
+            `<div class="apt-info4">
+            매매가: <strong>` +
+            result.apt.minPriceByLetter +
+            ` ~ ` +
+            result.apt.maxPriceByLetter +
+            `</strong>
+          </div>`;
+          if (result.apt.minLeasePriceByLetter) {
+            aptInfo +=
+              `<div class="apt-info4">
+              전세가: <strong>` +
+              result.apt.minLeasePriceByLetter +
+              ` ~ ` +
+              result.apt.maxLeasePriceByLetter +
+              `</strong>
+            </div>`;
+          }
+          aptInfo += `<button class="favorite-btn" onclick="addToFavorites('${markerId}')" id="favorite-${markerId}">관심목록에 추가</button>`;
 
+          // 1. 모든 .apt-sale 요소 숨기기
+          const saleItems = document.querySelectorAll(".apt-sale");
+          saleItems.forEach((item) => {
+            item.style.display = "none";
+          });
+
+          // 2. 클릭한 요소만 보이기
+          const targetElement = document.getElementById(`apt-${markerId}`);
+          if (targetElement) {
+            targetElement.innerHTML = aptInfo;
+            targetElement.style.display = "block";
+          }
         } catch (error) {
-          console.error('요청 실패:', error);
+          console.error("Error:", error);
         }
       }
 
+      function squareMeterToPyeong(sqm) {
+        const pyeong = sqm / 3.3058;
+        return pyeong.toFixed(2); // 소수점 둘째 자리까지 반올림
+      }
+
+      function addToFavorites(markerId) {
+        const apt = aptList.find((a) => a.markerId === markerId);
+        if (!apt) return;
+
+        fetch("/add_favorite", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(apt),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              const btn = document.getElementById(`favorite-${markerId}`);
+              btn.textContent = "관심목록에 추가됨";
+              btn.classList.add("added");
+              btn.disabled = true;
+            } else {
+              alert(data.message);
+            }
+          });
+      }
     </script>
   </body>
 </html>

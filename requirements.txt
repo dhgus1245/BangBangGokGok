@@ -1,1 +1,11 @@
-Flask>=3.0.0
+flask
+requests
+psycopg2-binary
+google-generativeai
+scikit-learn
+pillow
+tensorflow
+numpy
+pandas
+opencv-python
+gunicorn

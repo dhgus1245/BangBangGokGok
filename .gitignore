@@ -1,3 +1,16 @@
+# Model files (large, provide separately)
+model/*.keras
+model/*.h5
+model/*.pb
+
+# Data & uploads
+data/images/*
+!data/images/.gitkeep
+data/postgres/
+
+# Runtime user data
+static/json/favorites.json
+
 # Python
 __pycache__/
 *.py[cod]

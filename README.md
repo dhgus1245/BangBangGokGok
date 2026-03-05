@@ -1,42 +1,34 @@
 # BangBangGokGok (방방곡곡)
 
-Flask 기반 아파트 매물 검색 및 데이터 분석 API 서비스입니다.
+Flask 기반 통합 서비스 — **방방곡곡**(집값 분석) + **phonezipsa**(폰 등급/가격 예측) API
+
+---
 
 ## 주요 기능
 
 ### 1. 방방곡곡 — 집값 분석 사이트
 
-지역별 아파트 매물을 검색하고 지도에서 확인할 수 있는 웹 서비스입니다.
+서울 지역 아파트 매물을 조건별로 검색하고 지도에서 확인할 수 있는 웹 서비스입니다.
 
-- **메인 페이지** (`/`): 추천 아파트 매물 소개
-- **매물 검색** (`/result`): 구/동 기준 지역별 아파트 매물 검색
-  - 네이버 지도 API 연동으로 검색 결과 지도 표시
-  - 가격·면적·세대수 조건 필터링
-- **팀 소개** (`/intro`): 프로젝트 팀 소개
+| 경로 | 설명 |
+|------|------|
+| `/` | 방방곡곡 메인으로 리다이렉트 |
+| `/index` | 메인 — 럭셔리 아파트·상승 확률 UP 아파트 추천 |
+| `/search` | 매물 검색 (구, 가격, 평수, 연식, 역세권 조건) |
+| `/result` | 검색 결과 지도 표시 (네이버 지도 API) |
+| `/intro` | 팀 소개 |
+| `/favorites` | 관심목록 |
+| `/sale` (POST) | 아파트 매물 상세 조회 API |
 
-### 2. Data Analysis API — phonezipsa 연동
+### 2. phonezipsa — 폰 등급/가격 예측 API
 
-phonezipsa와 연동되는 데이터 분석용 REST API를 제공합니다.
+스마트폰 이미지를 분석해 등급 및 예상 가격을 제공합니다.
 
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| POST | `/sale` | 아파트 매물 상세 정보 조회 |
-| GET | `/result` | 지역별 매물 검색 결과 (쿼리파라미터: `city`) |
-
-**`/sale` API 예시**
-
-```json
-// Request
-{
-  "markerId": "단지/마커 ID"
-}
-
-// Response
-{
-  "status": "success",
-  "apt": { /* 아파트 상세 정보 */ }
-}
-```
+| 경로 | 설명 |
+|------|------|
+| `/phone` | phonezipsa 메인으로 리다이렉트 |
+| `/phone/index` | 폰 등급 예측 페이지 |
+| `/phone/api/grade` (POST) | 이미지 기반 등급·가격 예측 API |
 
 ---
 
@@ -44,15 +36,33 @@ phonezipsa와 연동되는 데이터 분석용 REST API를 제공합니다.
 
 ```
 BangBangGokGok/
-├── app.py              # Flask 앱 진입점
+├── app.py                    # Flask 앱 진입점
 ├── controller/
-│   └── MainController.py   # 라우트 정의
+│   ├── MainController.py     # 방방곡곡 라우트
+│   └── PhoneController.py    # phonezipsa 라우트
 ├── service/
-│   └── MainService.py     # 네이버 부동산 API 연동 로직
-├── templates/          # HTML 템플릿
-├── static/             # CSS, JS 정적 파일
+│   ├── MainService.py        # 네이버 부동산 API, 지역·매물 조회
+│   ├── AnalysisService.py    # 럭셔리·회귀분석 아파트 추출
+│   ├── RecoService.py        # 유사도 기반 매물 추천
+│   └── PhoneService.py       # 폰 이미지 등급·가격 예측 (TensorFlow, PostgreSQL)
+├── model/                    # AI 모델 (별도 준비 필요)
+│   ├── front_model.keras     # 앞면 등급 분류
+│   ├── back_model.keras      # 뒷면 등급 분류
+│   └── time_series_model.keras  # 가격 시계열 예측
+├── resources/
+│   └── csv/
+│       └── data.csv          # 아파트 데이터 (방방곡곡 분석용)
+├── static/
+│   ├── css/
+│   └── json/
+│       └── favorites.json    # 관심목록 저장
+├── templates/
+├── data/
+│   └── images/               # 업로드된 폰 이미지 (Docker 볼륨)
 ├── Dockerfile
-├── docker-compose.yml
+├── docker-compose.yml          # Flask 기본
+├── docker-compose.db.yml      # DB (PostgreSQL, ./data/postgres)
+├── docker-compose.images.yml  # 이미지 폴더 마운트 (./data/images)
 └── requirements.txt
 ```
 
@@ -70,19 +80,54 @@ python app.py
 ### Docker 실행
 
 ```bash
+# Flask만 실행
 docker-compose up -d --build
+
+# DB 포함 (PostgreSQL, ./data/postgres에 저장)
+docker-compose -f docker-compose.yml -f docker-compose.db.yml up -d --build
+
+# images 폴더 마운트 포함 (phonezipsa 이미지 업로드용)
+docker-compose -f docker-compose.yml -f docker-compose.images.yml up -d --build
+
+# 전체 (Flask + DB + images)
+docker-compose -f docker-compose.yml -f docker-compose.db.yml -f docker-compose.images.yml up -d --build
 ```
 
-실행 후 `http://localhost:5000` 에서 접속할 수 있습니다.
+실행 후:
+- 방방곡곡: `http://localhost:5000/index`
+- phonezipsa: `http://localhost:5000/phone/index`
 
 ---
 
 ## 환경 요구사항
 
-- Python 3.11+
-- Flask 3.0+
+### 방방곡곡
+
+- Python 3.12+
+- Flask, scikit-learn, pandas, requests
+
+### phonezipsa
+
+- PostgreSQL (DB: `phone`, `real_price`, `phone_model`, `gemini_template` 테이블)
+- 모델 파일: `model/front_model.keras`, `back_model.keras`, `time_series_model.keras`
+- Google Gemini API 키 (AI 문구 생성)
+- 업로드 이미지 경로: `/app/data/images` (또는 `./data/images` 마운트)
+
+### 환경 변수 (phonezipsa DB 연동)
+
+| 변수 | 기본값 | 설명 |
+|------|--------|------|
+| `DATABASE_HOST` | `postgres-db` | PostgreSQL 호스트 |
+| `DATABASE_PORT` | `5432` | PostgreSQL 포트 |
+| `DATABASE_NAME` | `phone` | DB 이름 |
+| `DATABASE_USER` | `postgres` | DB 사용자 |
+| `DATABASE_PASSWORD` | `postgres` | DB 비밀번호 |
+| `LOG_LEVEL` | `INFO` | 로그 레벨 (DEBUG/INFO/WARNING/ERROR) |
+
+---
 
 ## 외부 연동
 
-- **네이버 부동산 API**: 지역 번호(cortarNo), 매물 목록, 상세 정보 조회
+- **네이버 부동산 API**: 지역(cortarNo), 매물 목록, 상세 정보
 - **네이버 지도 API**: 검색 결과 지도 시각화 (클라이언트)
+- **Google Gemini API**: 폰 매물 AI 문구 생성 (phonezipsa)

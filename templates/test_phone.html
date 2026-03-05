@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>*방방곡곡* 내게 맞는 아파트 검색</title>
+  </head>
+  <body>
+    <h2>이미지 업로드</h2>
+    <input type="radio" id="p_front" name="p_dir" value="0" checked="checked" />
+    <label for="r2">앞면</label>
+    <input type="radio" id="p_back" name="p_dir" value="1" />
+    <label for="r3">뒷면</label>
+
+    <input type="file" id="imageInput" accept="image/*" />
+    <button onclick="uploadImage()">업로드</button>
+
+    <script>
+      function uploadImage() {
+        const p_dir = document.querySelector(
+          'input[name="p_dir"]:checked'
+        ).value;
+        const input = document.getElementById("imageInput");
+        const file = input.files[0];
+
+        if (!file) {
+          alert("이미지를 선택하세요.");
+          return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function () {
+          const base64Image = reader.result; // data:image/png;base64,~~~ 형식
+          // console.log("Encoded image:", base64Image);
+
+          // 서버로 전송
+          fetch("http://192.168.16.1:5000/phone/api/grade", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ p_img: base64Image, p_dir: p_dir }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("서버 응답:", data);
+              alertStr = "당신의 ";
+              if (data.dir == 0) {
+                alertStr += "앞면은 ";
+              } else {
+                alertStr += "뒷면은 ";
+              }
+              alertStr += data.grade;
+              alert(alertStr);
+            })
+            .catch((error) => {
+              console.error("에러 발생:", error);
+            });
+        };
+
+        reader.readAsDataURL(file); // base64로 읽기
+      }
+    </script>
+  </body>
+</html>
