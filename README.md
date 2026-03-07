@@ -61,8 +61,6 @@ BangBangGokGok/
 │   └── images/               # 업로드된 폰 이미지 (Docker 볼륨)
 ├── Dockerfile
 ├── docker-compose.yml          # Flask 기본
-├── docker-compose.db.yml      # DB (PostgreSQL, ./data/postgres)
-├── docker-compose.images.yml  # 이미지 폴더 마운트 (./data/images)
 └── requirements.txt
 ```
 
