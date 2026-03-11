@@ -78,17 +78,9 @@ python app.py
 ### Docker 실행
 
 ```bash
-# Flask만 실행
+# Flask 실행
 docker-compose up -d --build
 
-# DB 포함 (PostgreSQL, ./data/postgres에 저장)
-docker-compose -f docker-compose.yml -f docker-compose.db.yml up -d --build
-
-# images 폴더 마운트 포함 (phonezipsa 이미지 업로드용)
-docker-compose -f docker-compose.yml -f docker-compose.images.yml up -d --build
-
-# 전체 (Flask + DB + images)
-docker-compose -f docker-compose.yml -f docker-compose.db.yml -f docker-compose.images.yml up -d --build
 ```
 
 실행 후:
@@ -117,10 +109,13 @@ docker-compose -f docker-compose.yml -f docker-compose.db.yml -f docker-compose.
 |------|--------|------|
 | `DATABASE_HOST` | `postgres-db` | PostgreSQL 호스트 |
 | `DATABASE_PORT` | `5432` | PostgreSQL 포트 |
-| `DATABASE_NAME` | `phone` | DB 이름 |
+| `DATABASE_NAME` | `postgres` | DB 이름 |
 | `DATABASE_USER` | `postgres` | DB 사용자 |
 | `DATABASE_PASSWORD` | `postgres` | DB 비밀번호 |
 | `LOG_LEVEL` | `INFO` | 로그 레벨 (DEBUG/INFO/WARNING/ERROR) |
+
+`.env` 파일에는 실제 값(호스트, 비밀번호 등)을 넣고, 버전 관리는 값이 비어 있는 `sample.env`만 커밋합니다.
+컨테이너 환경에서는 `docker-compose.yml`과 같이 `postgres-db`라는 PostgreSQL 컨테이너/서비스 이름을 `DATABASE_HOST`로 사용합니다.
 
 ---
 

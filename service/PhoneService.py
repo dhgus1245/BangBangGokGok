@@ -121,7 +121,7 @@ class PhoneService:
         cursor = conn.cursor()
         cursor.execute("""
             SELECT rp_price::float
-            FROM real_price
+            FROM phone.real_price
             WHERE rp_pm_idx=%s AND rp_capacity=%s AND rp_regrade=%s
             ORDER BY rp_idx DESC
         """, (model, volume, grade))
@@ -190,20 +190,20 @@ class PhoneService:
             #모델명
             sql = """
                 SELECT pm_model_ko
-                FROM phone_model
+                FROM phone.phone_model
                 WHERE pm_idx = %s
                 LIMIT 1
-            """        
+            """
             cursor.execute(sql, (result.get("model"),))
             model_nm = cursor.fetchone()[0]
             
             #AI_TEXT
             sql = """
                     SELECT gt_text
-                    FROM gemini_template
+                    FROM phone.gemini_template
                     ORDER BY RANDOM()
                     LIMIT 1
-                """        
+                """
             cursor.execute(sql, (result.get("model"),))
             ai_text_prompt = cursor.fetchone()[0]
 

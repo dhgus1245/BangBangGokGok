@@ -7,10 +7,5 @@ services:
     container_name: flask-api
     ports:
       - "5000:5000"
-    environment:
-      - DATABASE_HOST=postgres-db
-      - DATABASE_PORT=5432
-      - DATABASE_NAME=phone
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=postgres
-      - LOG_LEVEL=INFO
+    env_file:
+      - .env
