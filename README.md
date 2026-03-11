@@ -98,9 +98,9 @@ docker-compose up -d --build
 
 ### phonezipsa
 
-- PostgreSQL (DB: `phone`, `real_price`, `phone_model`, `gemini_template` 테이블)
+- PostgreSQL (DB: `phone`, `real_price`, `phone_model` 테이블)
 - 모델 파일: `model/front_model.keras`, `back_model.keras`, `time_series_model.keras`
-- Google Gemini API 키 (AI 문구 생성)
+- OpenAI API 키 (AI 문구 생성)
 - 업로드 이미지 경로: `/app/data/images` (또는 `./data/images` 마운트)
 
 ### 환경 변수 (phonezipsa DB 연동)
@@ -123,4 +123,4 @@ docker-compose up -d --build
 
 - **네이버 부동산 API**: 지역(cortarNo), 매물 목록, 상세 정보
 - **네이버 지도 API**: 검색 결과 지도 시각화 (클라이언트)
-- **Google Gemini API**: 폰 매물 AI 문구 생성 (phonezipsa)
+- **OpenAI API**: 폰 매물 AI 문구 생성 (phonezipsa)

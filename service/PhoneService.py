@@ -2,7 +2,7 @@ import os
 import numpy as np
 np.set_printoptions(suppress=True, precision=2)
 import psycopg2
-import google.generativeai as genai
+from openai import OpenAI
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 from decimal import Decimal
 from flask import Flask, render_template, request, jsonify, Blueprint, session
@@ -196,45 +196,41 @@ class PhoneService:
             """
             cursor.execute(sql, (result.get("model"),))
             model_nm = cursor.fetchone()[0]
-            
-            #AI_TEXT
-            sql = """
-                    SELECT gt_text
-                    FROM phone.gemini_template
-                    ORDER BY RANDOM()
-                    LIMIT 1
-                """
-            cursor.execute(sql, (result.get("model"),))
-            ai_text_prompt = cursor.fetchone()[0]
 
             cursor.close()
 
             conn.close() #DB연결 해제
         
-            
-            #Ai 문구 생성======================================================
-            # API 키 설정
-            genai.configure(api_key="AIzaSyD2RP_x0-or3tskYTRcjWbNHrvUjilyvZI")
-
-            # 모델 초기화
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            # OpenAI 클라이언트 초기화 (.env에 OPENAI_API_KEY 설정 필요)
+            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
             def generate_phone_ad(model_name, storage, front_condition, back_condition, price=None):
+                prompt = (
+                    f"다음 중고 스마트폰 매물을 한국어로 매력적으로 소개하는 판매 문구를 작성해 주세요.\n"
+                    f"- 모델: {model_name}\n"
+                    f"- 용량: {storage}\n"
+                    f"- 앞면 등급: {front_condition}등급\n"
+                    f"- 뒷면 등급: {back_condition}등급\n"
+                    f"- 예상 가격(원): {price}\n"
+                    f"구매자가 신뢰감을 느낄 수 있도록 상태를 솔직하게 설명하면서도, 구매를 유도할 수 있는 자연스러운 문장을 4문장 이하로 작성해 주세요."
+                )
 
-                prompt = f"""
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {"role": "system", "content": "당신은 중고 스마트폰 판매 문구를 작성하는 한국어 카피라이터입니다."},
+                        {"role": "user", "content": prompt},
+                    ],
+                )
+                return response.choices[0].message.content.strip()
 
-                - 모델: {model_name}
-                - 용량: {storage}
-                - 앞면등급: {front_condition}등급
-                - 뒷면등급: {back_condition}등급
-                - 가격: {price}
-
-                """ + ai_text_prompt
-
-                response = model.generate_content(prompt)
-                return response.text
-            
-            return generate_phone_ad(model_nm, result.get("volume"), result.get("front"), result.get("back"), result.get("price").get("avg"))
+            return generate_phone_ad(
+                model_nm,
+                result.get("volume"),
+                result.get("front"),
+                result.get("back"),
+                result.get("price").get("avg"),
+            )
                 
         except Exception as e:
             return f"AI 문장 생성에 실패했습니다: {e}"

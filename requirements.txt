@@ -1,7 +1,7 @@
 flask
 requests
 psycopg2-binary
-google-generativeai
+openai
 scikit-learn
 pillow
 tensorflow
