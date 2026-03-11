@@ -5,6 +5,8 @@ services:
     build: .
     image: flask
     container_name: flask-api
+    volumes:
+      - ../data/images:/app/data/images
     ports:
       - "5000:5000"
     env_file:
